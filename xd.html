@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa con Leaflet</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Mapa Interactivo</h1>
+    <div id="map"></div>
+    <input type="text" id="search" placeholder="Buscar dirección">
+    <button id="searchBtn">Buscar</button>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script>
+        // Inicializa el mapa
+        var map = L.map('map').setView([40.4168, -3.7038], 13); // Coordenadas de Madrid
+
+        // Capa de OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // Inicializa el geocoder
+        var geocoder = L.Control.geocoder().addTo(map);
+
+        // Función de búsqueda
+        document.getElementById('searchBtn').onclick = function() {
+            var address = document.getElementById('search').value+" ags";
+            geocoder.geocode(address, function(results) {
+                if (results && results.length > 0) {
+                    var latlng = results[0].center;
+                    map.setView(latlng, 13);
+                    L.marker(latlng).addTo(map)
+                        .bindPopup(results[0].name)
+                        .openPopup();
+                } else {
+                    alert("No se encontró la dirección.");
+                }
+            });
+        };
+    </script>
+</body>
+</html>
