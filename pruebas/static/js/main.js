@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }).addTo(map);
 
     // Inicializa el geocoder
-    var geocoder = L.Control.Geocoder.nominatim(); // Cambia aquí
+    var geocoder = L.Control.Geocoder.nominatim(); // Inicialización
 
     var currentMarker = null;
     var currentCircle = null;
@@ -60,49 +60,56 @@ inputField.addEventListener('input', function() {
     };
 
 
-    document.getElementById('searchBtn').onclick = function() {
+    document.getElementById('searchBtn').onclick = function () {
         clearMap();
         document.getElementById('search_results').style.display = 'block';
-
+    
         var address = document.getElementById('search_input').value;
         var filteredAddress = address + ', Aguascalientes, Aguascalientes'; // Filtra la búsqueda
-        console.log(filteredAddress);
-        
-        geocoder.geocode(filteredAddress, function(results) {
-            document.getElementById('search_results').innerHTML = ''; // Limpiar resultados previos
-            
-            if (results && results.length > 0) {
-                results.forEach(function(result) {
-                    var latlng = result.center;
-                    var resultDiv = document.createElement('div');
-                    resultDiv.innerText = result.name;
-                    resultDiv.onclick = function() {
-                        map.setView(latlng, 13);
-                        // Crear el marcador
-                        currentMarker = L.marker(latlng).addTo(map)
-                            .bindPopup(result.name)
-                            .openPopup();
+        console.log("Buscando: " + filteredAddress);
+    
+        // Construir la URL para la solicitud de Nominatim
+        var nominatimUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(filteredAddress)}&format=json&addressdetails=1`;
+    
+        // Realizar la solicitud con fetch
+        fetch(nominatimUrl)
+            .then(response => response.json())
+            .then(results => {
+                console.log("Resultados de la búsqueda:", results);
+                document.getElementById('search_results').innerHTML = ''; // Limpiar resultados previos
+    
+                if (results && results.length > 0) {
+                    results.forEach(result => {
+                        var latlng = { lat: parseFloat(result.lat), lng: parseFloat(result.lon) };
+                        var resultDiv = document.createElement('div');
+                        resultDiv.innerText = result.display_name;
+    
+                        resultDiv.onclick = function () {
+                            map.setView(latlng, 13);
 
-                        // Mostrar el botón de ruta
-                        document.getElementById('route_button').style.display = 'block';
+                            currentMarker = L.marker(latlng).addTo(map)
+                                .bindPopup(result.display_name)
+                                .openPopup();
 
-                        // Almacenar el marcador en allMarkers
-                        allMarkers.push(currentMarker);
+                            document.getElementById('route_button').style.display = 'block';
+
+                            allMarkers.push(currentMarker);
+                        };
                         
-                        // Guardar latitud y longitud en el marcador
-                        currentMarker.latlng = [latlng.lat, latlng.lng]; // Asegúrate de que las coordenadas sean correctas
-                        //console.log(currentMarker);
-                    };
-                    document.getElementById('search_results').appendChild(resultDiv);
-                });
-            } else {
-                var resultsDiv = document.getElementById('search_results');
-                resultsDiv.innerHTML = '<p>No se encontraron colonias.</p>';
-
-
-            }
-        });
-    };  
+    
+                        document.getElementById('search_results').appendChild(resultDiv);
+                    });
+                } else {
+                    var resultsDiv = document.getElementById('search_results');
+                    resultsDiv.innerHTML = '<p>No se encontraron colonias.</p>';
+                }
+            })
+            .catch(error => {
+                console.error("Error al realizar la búsqueda:", error);
+                document.getElementById('search_results').innerHTML = '<p>Hubo un error al realizar la búsqueda.</p>';
+            });
+    };
+    
     
 
     function LatLng(a) {

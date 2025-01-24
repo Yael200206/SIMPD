@@ -14,11 +14,11 @@ socketio = SocketIO(app)
 
 
 def cargar_puntos_zonas():
-    with open(r'C:\Users\hiram\OneDrive\Documents\reserva\pruebas\colonias_modificado.json', 'r') as archivo:
+    with open(r'C:\Users\Administrator\Documents\SIMPD\SIMPD\pruebas\colonias_modificado.json', 'r') as archivo:
         return json.load(archivo)
     
 def ubicaciones_camaras():
-    with open(r'C:\Users\hiram\OneDrive\Documents\reserva\pruebas\ubicaciones_camaras.json', 'r') as archivo:
+    with open(r'C:\Users\Administrator\Documents\SIMPD\SIMPD\pruebas\ubicaciones_camaras.json', 'r') as archivo:
         return json.load(archivo)
 
 puntos_zonas = cargar_puntos_zonas()
