@@ -59,12 +59,18 @@ inputField.addEventListener('input', function() {
         socket.emit('search', query); 
     };
 
-
-    document.getElementById('searchBtn').onclick = function () {
+    document.getElementById('search_input').addEventListener('input', function () {
         clearMap();
         document.getElementById('search_results').style.display = 'block';
     
         var address = document.getElementById('search_input').value;
+    
+        // Solo buscar si hay al menos 3 caracteres
+        if (address.length < 3) {
+            document.getElementById('search_results').innerHTML = '<p>Escribe al menos 3 caracteres...</p>';
+            return;
+        }
+    
         var filteredAddress = address + ', Aguascalientes, Aguascalientes'; // Filtra la búsqueda
         console.log("Buscando: " + filteredAddress);
     
@@ -86,16 +92,15 @@ inputField.addEventListener('input', function() {
     
                         resultDiv.onclick = function () {
                             map.setView(latlng, 13);
-
+    
                             currentMarker = L.marker(latlng).addTo(map)
                                 .bindPopup(result.display_name)
                                 .openPopup();
-
+    
                             document.getElementById('route_button').style.display = 'block';
-
+    
                             allMarkers.push(currentMarker);
                         };
-                        
     
                         document.getElementById('search_results').appendChild(resultDiv);
                     });
@@ -108,7 +113,7 @@ inputField.addEventListener('input', function() {
                 console.error("Error al realizar la búsqueda:", error);
                 document.getElementById('search_results').innerHTML = '<p>Hubo un error al realizar la búsqueda.</p>';
             });
-    };
+    });
     
     
 
